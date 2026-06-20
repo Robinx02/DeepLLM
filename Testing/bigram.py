@@ -16,7 +16,7 @@ n_embd = 32
 
 #-------------------------------------
 
-path = 'C:\ptoh\DeepLLM\data\input.txt'
+path = r'C:\ptoh\DeepLLM\data\input.txt'
 if os.path.exists(path):
     with open(path, 'r', encoding='utf-8') as f:
         text = f.read()
@@ -87,7 +87,7 @@ class BigramLanguageModel(nn.Module):
         tok_emb = self.token_embedding_table(idx)  # (B,T,C)
         pos_emb = self.positon_embedding_table(torch.arange(T,device = device))
         x = tok_emb + pos_emb
-        logits = self.lm_head(tok_emb) 
+        logits = self.lm_head(x) 
         
         
         if targets is None:
@@ -103,7 +103,8 @@ class BigramLanguageModel(nn.Module):
         # idx is (B,T) array of indices in the current context 
         for _ in range(max_new_tokens):
             #get the predictions
-            logits , loss = self(idx)  #this go to the forward() of self 
+            idx_cond = idx[:,-block_size:]
+            logits , loss = self(idx_cond)  #this go to the forward() of self 
             logits = logits[:,-1,:] # becomes (B , C)
             # apply softmax to get probabilities
             probs = F.softmax(logits , dim=-1) # (B,C)
