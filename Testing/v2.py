@@ -72,7 +72,7 @@ def estimate_loss():
 
 
 #implementing the attention head in this one
-class Head(nn.module):
+class Head(nn.Module):
     """one head of self-attention"""
 
     def __init__(self,head_size):
@@ -94,7 +94,14 @@ class Head(nn.module):
         out = wei @ v
         return out
     
+class MultiHeadAttention(nn.Module):
 
+    def __init__(self , num_heads , head_size):
+        super().__init()
+        self.heads = nn.ModuleList([Head(head_size) for _ in range (num_heads)])
+    
+    def forward(self , x):
+        return torch.cat([h(x) for h in self.heads] , dim=-1)
 
 class BigramLanguageModel(nn.Module):
 
@@ -103,6 +110,7 @@ class BigramLanguageModel(nn.Module):
         #each token directly reads off the logits for the next token from the lookup table
         self.token_embedding_table = nn.Embedding(vocab_size,n_embd)
         self.positon_embedding_table = nn.Embedding(block_size , n_embd)
+        self.sa_heads = MultiHeadAttention(4,n_embd//4)  #i.e 4 heads of 8 dimensional self attention
         self.lm_head = nn.Linear(n_embd, vocab_size)
     
     def forward(self,idx,targets=None):
@@ -112,6 +120,7 @@ class BigramLanguageModel(nn.Module):
         tok_emb = self.token_embedding_table(idx)  # (B,T,C)
         pos_emb = self.positon_embedding_table(torch.arange(T,device = device))
         x = tok_emb + pos_emb
+        x = self.sa_heads(x)
         logits = self.lm_head(x) 
         
         
