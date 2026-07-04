@@ -1,0 +1,73 @@
+import json
+
+class BPE:
+
+    def __init__(self,vocab_size):
+        self.vocab_size = vocab_size
+        self.base_vocab = 256
+        self.num_merges =  self.vocab_size - self.base_vocab
+        self.merges = {}
+        self.vocab = {}
+
+    def get_pairs(self,ids):
+        counts = {}
+        for pair in zip(ids[0:], ids[1:]):
+            counts[pair] = counts.get(pair,0) +1
+        return counts
+
+    def merge(self,ids , pair , idx):
+        new_ids = []
+        i = 0
+        while i < len(ids):
+            if i < len(ids) - 1 and ids[i] == pair[0] and ids[i+1] == pair[1]:
+                new_ids.append(idx)
+                i += 2
+            else:
+                new_ids.append(ids[i])
+                i += 1
+        return new_ids 
+
+    def display_merges(self):
+        for item in self.char_merges.items():
+            if item is not None:
+                ch1 , ch2 = item[0]
+                print(f"'{ch1}'+'{ch2}'---> {item[1]}")
+
+    def fit(self,text):
+        merges = {}
+        vocab = {idx:bytes([idx]) for idx in range(256)}  #int -> bytes
+
+        ids = list(text.encode("utf-8"))
+        for i in range(self.num_merges):
+            pairs = self.get_pairs(ids)
+            top_pair = max(pairs , key = pairs.get)
+            idx = 256 + i
+            ids = self.merge(ids , top_pair , idx)
+
+            #saving the merge
+            merges[top_pair] = idx
+
+            vocab[idx] = vocab[top_pair[0]] + vocab[top_pair[1]]
+
+        self.merges = merges
+        self.vocab = vocab
+
+    def encode(self,text):
+        tokens = list(text.encode('utf-8'))
+        while len(tokens) >=2:
+            pairs = self.get_pairs(tokens)
+            pair = min(pairs, key=lambda p: self.merges.get(p,float("inf")))
+            if pair not in self.merges:
+                break # nothing else can be merged
+            idx = self.merges[pair]  
+            
+            tokens = self.merge(tokens,pair , idx)
+
+        return tokens
+
+    #decode a list of tokens back into string
+    def decode(self,ids):
+        tokens = b"".join(self.vocab[idx] for idx in ids)
+        text = tokens.decode("utf-8" , errors = "replace")
+        return text 
+                
