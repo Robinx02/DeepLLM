@@ -1,4 +1,5 @@
 import torch
+import matplotlib.pyplot as plt
 import os
 from model import TransformerModel, block_size, device
 from BPEToken import BPE
@@ -10,7 +11,7 @@ eval_interval = 500
 learning_rate = 3e-4
 eval_iters = 200
 vocab_size = 3000
-weight_path = r'C:\ptoh\DeepLLM\output'  #file where weights are saved
+weight_path = r'C:\ptoh\DeepLLM\output\checkpoint.pth'  #file where weights are saved
 
 #--- Data Preparation ---
 path = r'C:\ptoh\DeepLLM\data\input.txt'
@@ -43,7 +44,7 @@ def get_batch(split):
 
 
 @torch.no_grad()
-def estimate_loss()
+def estimate_loss():
     
     out = {}
     model.eval()
@@ -81,15 +82,33 @@ if os.path.exists(weight_path):
 else:
     print("no previous saved weights")
 
-for iter in range(max_iters):
+# Initialize lists to store losses
+train_losses = []
+val_losses = []
+steps = []
+
+for iter in range(start_iter , max_iters):
 
     #every once in a while evalute the loss in train and val sets
-    if iter % eval_interval == 0:
+    if iter % eval_interval == 0 or iter == max_iters-1:
         losses = estimate_loss()
         print(f"stop {iter}: train loss {losses['train']:.4f} , val loss {losses['val']:.4f}")
+        #saving the current model state
+        steps.append(iter)
+        train_losses.append(losses['train'])
+        val_losses.append(losses['val'])
 
+        checkpoint = {
+            'iter':iter , 
+            'model_state_dict' : model.state_dict(),
+            'optimizer_state_dict' : optimizer.state_dict(),
+            'val_loss': losses['val']
+        }
+        torch.save(checkpoint ,weight_path)
+        print(f"weights and training checkpoint saved to {weight_path}")
+    
     xb , yb = get_batch('train')
-
+    
     #sampling batch of data
     logits , loss = model(xb,yb)
     optimizer.zero_grad(set_to_none = True)
@@ -97,5 +116,25 @@ for iter in range(max_iters):
     optimizer.step()
 
 
+#plotting the loss graph
+
+plt.figure(figsize=(8, 6))
+plt.plot(steps, train_losses, label='Train Loss')
+plt.plot(steps, val_losses, label='Validation Loss')
+plt.xlabel('Steps')
+plt.ylabel('Loss')
+plt.title('Training and Validation Loss over Time')
+plt.legend()
+plt.show()
+
+
+print('Training complete')
+model.eval()
+context = torch.zeros((1, 1), dtype=torch.long, device=device)
+with torch.no_grad():
+    generated_indices = model.generate(context , max_new_tokens = 1000)
+output_text = bpe_token.decode(generated_indices[0].tolist())
+with open('output.txt', "w" , encoding = 'utf-8') as file:
+    file.write(output_text)
 
 
