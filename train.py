@@ -64,4 +64,38 @@ optimizer = torch.optim.AdamW(model.parameters() , lr = learning_rate)
 
 start_iter = 0 # default starting iteration
 
+# to check if checkpoints exist for model 
+
+if os.path.exists(weight_path):
+    print(f"weight exists at {weight_path}")
+    checkpoint = torch.load(weight_path , map_location = device)
+
+    #restoring the opetimizer and model states
+
+    model.load_state_dict(checkpoint['model_state_dict'])
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    start_iter = checkpoint['iter'] + 1
+
+    print(f"loaded the training checkpoint")
+
+else:
+    print("no previous saved weights")
+
+for iter in range(max_iters):
+
+    #every once in a while evalute the loss in train and val sets
+    if iter % eval_interval == 0:
+        losses = estimate_loss()
+        print(f"stop {iter}: train loss {losses['train']:.4f} , val loss {losses['val']:.4f}")
+
+    xb , yb = get_batch('train')
+
+    #sampling batch of data
+    logits , loss = model(xb,yb)
+    optimizer.zero_grad(set_to_none = True)
+    loss.backward()
+    optimizer.step()
+
+
+
 
