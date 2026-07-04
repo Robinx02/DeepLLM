@@ -67,7 +67,35 @@ class BPE:
 
     #decode a list of tokens back into string
     def decode(self,ids):
+        vocab = {idx: bytes([idx]) for idx in range(256)}
+        for (p0,p1) , idx in self.merges.items():
+            vocab[idx] = vocab[p0] + vocab[p1]
+        
         tokens = b"".join(self.vocab[idx] for idx in ids)
         text = tokens.decode("utf-8" , errors = "replace")
         return text 
+
+    def save(self , filepath):
+        data = {
+            'vocab_size' : self.vocab_size,
+            'merges' : {f"{k[0]}-{k[1]}": v for k , v in self.merges.items()},
+            'vocab' : {k: list(v) for k, v in self.vocab.items()}
+        }
+
+        with open(filepath , 'w') as f:
+            json.dump(data, f)
+
+    # load the tokenizer state from a config file
+    @classmethod
+    def load(cls , filepath):
+        with open(filepath,'r') as f:
+            data = json.load(f)
+            tokenizer = cls(data['vocab_size'])
+            tokenizer.merges = {
+                tuple(map(int, k.split('-'))) : v
+                for k , v in data['merges'].items()
+            }        
+            tokenizer.vocab = {int(k): bytes(v) for k,v in data['vocab'.items()]}
+            return tokenizer 
+        
                 
