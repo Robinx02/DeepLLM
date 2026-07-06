@@ -48,7 +48,8 @@ class BPE:
             merges[top_pair] = idx
 
             vocab[idx] = vocab[top_pair[0]] + vocab[top_pair[1]]
-
+            if (i + 1) % 50 ==0:
+                print(f"merge {i+1}/{self.num_merges}" , flush = True)
         self.merges = merges
         self.vocab = vocab
 
