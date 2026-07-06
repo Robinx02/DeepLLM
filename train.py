@@ -5,12 +5,12 @@ from model import TransformerModel, block_size, device
 from BPEToken import BPE
 #-----Hyperparameters------
 
-batch_size = 64
-max_iters =5000
+batch_size = 128
+max_iters =20000
 eval_interval = 500
 learning_rate = 3e-4
 eval_iters = 200
-vocab_size = 3000
+vocab_size = 8000
 weight_path = r'C:\ptoh\DeepLLM\output\checkpoint.pth'  #file where weights are saved
 
 #--- Data Preparation ---
@@ -62,7 +62,7 @@ def estimate_loss():
 model = TransformerModel(vocab_size = vocab_size)
 model = model.to(device)
 optimizer = torch.optim.AdamW(model.parameters() , lr = learning_rate)
-
+scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer , T_max = max_iters , eta_min=1e-5)
 start_iter = 0 # default starting iteration
 
 # to check if checkpoints exist for model 
@@ -114,6 +114,7 @@ for iter in range(start_iter , max_iters):
     optimizer.zero_grad(set_to_none = True)
     loss.backward()
     optimizer.step()
+    scheduler.step()
 
 
 #plotting the loss graph

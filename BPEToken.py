@@ -95,7 +95,7 @@ class BPE:
                 tuple(map(int, k.split('-'))) : v
                 for k , v in data['merges'].items()
             }        
-            tokenizer.vocab = {int(k): bytes(v) for k,v in data['vocab'.items()]}
+            tokenizer.vocab = {int(k): bytes(v) for k,v in data['vocab'].items()}
             return tokenizer 
         
                 
