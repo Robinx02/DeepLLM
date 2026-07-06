@@ -14,7 +14,7 @@ vocab_size = 8000
 weight_path = r'C:\ptoh\DeepLLM\output\checkpoint.pth'  #file where weights are saved
 
 #--- Data Preparation ---
-path = r'C:\ptoh\DeepLLM\data\input.txt'
+path = r'C:\ptoh\DeepLLM\data\economy_train.txt'
 if os.path.exists(path):
     with open(path, 'r', encoding='utf-8') as f:
         text = f.read()
@@ -23,7 +23,8 @@ else:
     print(f"No file found at {path}. Using empty fallback text.")
 
 bpe_token = BPE(vocab_size)
-bpe_token.fit(text[:10**5])  #training the tokenizer on the first 100k tokens
+bpe_token.fit(text)  #training the tokenizer on full dataset
+bpe_token.save(r'C:\ptoh\DeepLLM\output\bpe_finance.json')
 
 #splitting dataset into train and test split
 
@@ -126,7 +127,8 @@ plt.xlabel('Steps')
 plt.ylabel('Loss')
 plt.title('Training and Validation Loss over Time')
 plt.legend()
-plt.show()
+plt.savefig(r'C:\ptoh\DeepLLM\output\loss_curve.png')
+print("saved the loss curve")
 
 
 print('Training complete')

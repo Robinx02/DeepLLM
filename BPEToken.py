@@ -67,9 +67,6 @@ class BPE:
 
     #decode a list of tokens back into string
     def decode(self,ids):
-        vocab = {idx: bytes([idx]) for idx in range(256)}
-        for (p0,p1) , idx in self.merges.items():
-            vocab[idx] = vocab[p0] + vocab[p1]
         
         tokens = b"".join(self.vocab[idx] for idx in ids)
         text = tokens.decode("utf-8" , errors = "replace")
