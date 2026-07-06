@@ -132,12 +132,4 @@ print("saved the loss curve")
 
 
 print('Training complete')
-model.eval()
-context = torch.zeros((1, 1), dtype=torch.long, device=device)
-with torch.no_grad():
-    generated_indices = model.generate(context , max_new_tokens = 1000)
-output_text = bpe_token.decode(generated_indices[0].tolist())
-with open('output.txt', "w" , encoding = 'utf-8') as file:
-    file.write(output_text)
-
 
