@@ -1,4 +1,7 @@
 import json
+import numpy as np
+from collections import defaultdict
+
 
 class BPE:
 
@@ -8,6 +11,7 @@ class BPE:
         self.num_merges =  self.vocab_size - self.base_vocab
         self.merges = {}
         self.vocab = {}
+        self.merge_rank = {}
 
     def get_pairs(self,ids):
         counts = {}
