@@ -1,19 +1,17 @@
 import torch
 from torch.nn import functional as F
-import tiktoken 
 from model import TransformerModel , block_size , device
-#from BPEToken import BPE
+from BPEToken import BPE
 
 #---paths---
 
 weight_path = r'C:\ptoh\DeepLLM\output\checkpoint.pth'
 tokenzier_path = r'C:\ptoh\DeepLLM\output\bpe_finance.json'
-vocab_size = 50257
+vocab_size = 8000
 
 # ---load tokenizer--- 
 
-#bpe_token = BPE.load(tokenzier_path)
-enc = tiktoken.get_encoding("gpt2")
+bpe_token = BPE.load(tokenzier_path)
 
 # ---load model---
 model = TransformerModel(vocab_size=vocab_size).to(device)
@@ -26,9 +24,9 @@ print(f"Model loaded from iter {checkpoint['iter']} | val loss {checkpoint['val_
 
 def chat(question , max_new_tokens=300 , temprature = 0.8 , top_k=50):
     prompt  = f"<|user|>\n{question}\n<|assistant|>\n"
-    prompt_ids = enc.encode(prompt)
+    prompt_ids = bpe_token.encode(prompt)
 
-    eos_ids = enc.encode("<|endoftext|>")
+    eos_ids = bpe_token.encode("<|endoftext|>")
     eos_id = eos_ids[0] if len(eos_ids) == 1 else None
 
     idx = torch.tensor([prompt_ids] , dtype = torch.long , device= device)
@@ -49,7 +47,7 @@ def chat(question , max_new_tokens=300 , temprature = 0.8 , top_k=50):
 
             idx = torch.cat([idx, idx_next], dim=1)
     generated = idx[0, len(prompt_ids):].tolist()
-    return enc.decode(generated)
+    return bpe_token.decode(generated)
 
 #__for running__
 

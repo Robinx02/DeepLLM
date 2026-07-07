@@ -1,17 +1,16 @@
 import torch
-import tiktoken
 import matplotlib.pyplot as plt
 import os
 from model import TransformerModel, block_size, device
-#from BPEToken import BPE
+from BPEToken import BPE
 #-----Hyperparameters------
 
-batch_size = 128
+batch_size = 64
 max_iters =20000
 eval_interval = 500
 learning_rate = 3e-4
 eval_iters = 200
-#vocab_size = 8000
+vocab_size = 8000
 weight_path = r'C:\ptoh\DeepLLM\output\checkpoint.pth'  #file where weights are saved
 
 #--- Data Preparation ---
@@ -23,21 +22,14 @@ else:
     text = ''
     print(f"No file found at {path}. Using empty fallback text.")
 
-#bpe_token = BPE(vocab_size)
-#bpe_token.fit(text[:500_000])  #training on 500k chars
-#bpe_token.save(r'C:\ptoh\DeepLLM\output\bpe_finance.json')
-
-#this takes around 3-5hrs just for the BPE fitting alone because pure python implementation is O(n^2) merges get exponentially slower
-
-
-enc = tiktoken.get_encoding("gpt2")
-vocab_size = 50257
+bpe_token = BPE(vocab_size)
+bpe_token.fit(text[:500_000])  #training on 500k chars
+bpe_token.save(r'C:\ptoh\DeepLLM\output\bpe_finance.json')
 
 #splitting dataset into train and test split
 
-#data = torch.tensor(bpe_token.encode(text) , dtype=torch.long)
 print("Tokenizing text...")
-data = torch.tensor(enc.encode(text,allowed_special = {"<|endoftext|>"}) ,dtype = torch.long)
+data = torch.tensor(bpe_token.encode(text) , dtype=torch.long)
 print(f"Tokenization done — {len(data):,} tokens")
 n = int(0.9*len(data))  #90% for training
 train_data = data[:n]
