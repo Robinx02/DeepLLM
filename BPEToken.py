@@ -9,7 +9,7 @@ class BPE:
         self.num_merges =  self.vocab_size - self.base_vocab
         self.merges = {}
         self.vocab = {}
-        self.merge_rank = {}
+        self._merge_rank = {}
 
     def get_pairs(self,ids):
         counts = {}

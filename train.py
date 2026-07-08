@@ -12,6 +12,7 @@ learning_rate = 3e-4
 eval_iters = 200
 vocab_size = 8000
 weight_path = r'C:\ptoh\DeepLLM\output\checkpoint.pth'  #file where weights are saved
+encoded_path = r'C:\ptoh\DeepLLM\data\encoded_data.pt'
 
 #--- Data Preparation ---
 path = r'C:\ptoh\DeepLLM\data\economy_train.txt'
@@ -22,15 +23,22 @@ else:
     text = ''
     print(f"No file found at {path}. Using empty fallback text.")
 
-bpe_token = BPE(vocab_size)
-bpe_token.fit(text[:500_000])  #training on 500k chars
-bpe_token.save(r'C:\ptoh\DeepLLM\output\bpe_finance.json')
+if os.path.exists(encoded_path):
+    print("loading pre-encoded data")
+    bpe_token = BPE.load(r'C:\ptoh\DeepLLM\output\bpe_finance.json')
+    data = torch.load(encoded_path)
+    print(f"loaded {len(data):,} toekns")
+else:
+    bpe_token = BPE(vocab_size)
+    bpe_token.fit(text[:500_000])  #training on 500k chars
+    bpe_token.save(r'C:\ptoh\DeepLLM\output\bpe_finance.json')
+    print("Tokenizing text...")
+    data = torch.tensor(bpe_token.encode_batch(text) , dtype=torch.long)
+    torch.save(data,r'C:\ptoh\DeepLLM\data\encoded_data.pt')
+    print(f"Tokenization done — {len(data):,} tokens and encoded data saved....")
 
 #splitting dataset into train and test split
 
-print("Tokenizing text...")
-data = torch.tensor(bpe_token.encode(text) , dtype=torch.long)
-print(f"Tokenization done — {len(data):,} tokens")
 n = int(0.9*len(data))  #90% for training
 train_data = data[:n]
 val_data = data[n:]
