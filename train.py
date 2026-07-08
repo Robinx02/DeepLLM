@@ -30,7 +30,7 @@ if os.path.exists(encoded_path):
     print(f"loaded {len(data):,} toekns")
 else:
     bpe_token = BPE(vocab_size)
-    bpe_token.fit(text[:500_000])  #training on 500k chars
+    bpe_token.fit(text[:1_00_000])  #training on 500k chars
     bpe_token.save(r'C:\ptoh\DeepLLM\output\bpe_finance.json')
     print("Tokenizing text...")
     data = torch.tensor(bpe_token.encode_batch(text) , dtype=torch.long)
