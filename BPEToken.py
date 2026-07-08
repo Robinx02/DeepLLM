@@ -1,7 +1,5 @@
 import json
 import numpy as np
-from collections import defaultdict
-
 
 class BPE:
 
@@ -40,10 +38,12 @@ class BPE:
     def fit(self,text):
         merges = {}
         vocab = {idx:bytes([idx]) for idx in range(256)}  #int -> bytes
-
         ids = list(text.encode("utf-8"))
+        
         for i in range(self.num_merges):
             pairs = self.get_pairs(ids)
+            if not pairs:
+                break
             top_pair = max(pairs , key = pairs.get)
             idx = 256 + i
             ids = self.merge(ids , top_pair , idx)
@@ -52,24 +52,67 @@ class BPE:
             merges[top_pair] = idx
 
             vocab[idx] = vocab[top_pair[0]] + vocab[top_pair[1]]
-            if (i + 1) % 50 ==0:
+            if (i + 1) % 100 ==0:
                 print(f"merge {i+1}/{self.num_merges}" , flush = True)
         self.merges = merges
         self.vocab = vocab
+        self._merge_rank = {pair: rank for rank , pair in enumerate(merges.keys())}
 
     def encode(self,text):
+        
         tokens = list(text.encode('utf-8'))
-        while len(tokens) >=2:
-            pairs = self.get_pairs(tokens)
-            pair = min(pairs, key=lambda p: self.merges.get(p,float("inf")))
-            if pair not in self.merges:
-                break # nothing else can be merged
-            idx = self.merges[pair]  
+        if len(tokens) < 2:
+            return tokens
+
+        merge_rank = {pair: i for i, pair in enumerate(self.merges.keys())}
+
+        while len(tokens) >= 2:
+            arr = np.array(tokens, dtype=np.int32)
+
+            pairs = list(zip(arr[:-1].tolist(), arr[1:].tolist()))
             
-            tokens = self.merge(tokens,pair , idx)
+            best_rank = float('inf')
+            best_pair = None
+            for pair in pairs:
+                rank = merge_rank.get(pair, float('inf'))
+                if rank < best_rank:
+                    best_rank = rank
+                    best_pair = pair
 
-        return tokens
+            if best_pair is None or best_rank == float('inf'):
+                break
 
+            idx = self.merges[best_pair]
+            new_tokens = []
+            i = 0
+            while i < len(tokens):
+                if i < len(tokens) - 1 and tokens[i] == best_pair[0] and tokens[i+1] == best_pair[1]:
+                    new_tokens.append(idx)
+                    i += 2
+                else:
+                    new_tokens.append(tokens[i])
+                    i += 1
+            tokens = new_tokens
+        return tokens       
+
+    def encode_batch(self, text, chunk_size=100_000):
+        print(f"Encoding {len(text)/1_000_000:.1f}MB in chunks...", flush=True)
+    
+        chunks = text.split("<|endoftext|>")
+        all_ids = []
+
+        for i, chunk in enumerate(chunks):
+            if not chunk.strip():
+                continue
+            ids = self.encode(chunk + "<|endoftext|>")
+            all_ids.extend(ids)
+
+            if (i + 1) % 100 == 0:
+                print(f"  chunk {i+1}/{len(chunks)} — {len(all_ids):,} tokens so far", flush=True)
+
+        print(f"Encoding done — {len(all_ids):,} total tokens", flush=True)
+        return all_ids
+    
     #decode a list of tokens back into string
     def decode(self,ids):
         
@@ -98,6 +141,9 @@ class BPE:
                 for k , v in data['merges'].items()
             }        
             tokenizer.vocab = {int(k): bytes(v) for k,v in data['vocab'].items()}
+            tokenizer._merge_rank = {
+                pair:i for i, pair in enumerate(tokenizer.merges.keys())
+            }
             return tokenizer 
         
                 
