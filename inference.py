@@ -22,7 +22,7 @@ print(f"Model loaded from iter {checkpoint['iter']} | val loss {checkpoint['val_
 
 #--- inference ---
 
-def chat(question , max_new_tokens=300 , temprature = 0.8 , top_k=50):
+def chat(question , max_new_tokens=300 , temprature = 0.6 , top_k=30):
     prompt  = f"<|user|>\n{question}\n<|assistant|>\n"
     prompt_ids = bpe_token.encode(prompt)
 
