@@ -5,7 +5,7 @@ from model import TransformerModel, block_size, device
 from BPEToken import BPE
 #-----Hyperparameters------
 
-batch_size = 32
+batch_size = 48
 max_iters =20000
 eval_interval = 500
 learning_rate = 3e-4
@@ -71,6 +71,8 @@ def estimate_loss():
 
 
 model = TransformerModel(vocab_size = vocab_size)
+total_params = sum(p.numel() for p in model.parameters())
+print(f"Model parameters: {total_params:,}")
 model = model.to(device)
 optimizer = torch.optim.AdamW(model.parameters() , lr = learning_rate)
 scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer , T_max = max_iters , eta_min=1e-5)
@@ -142,4 +144,3 @@ print("saved the loss curve")
 
 
 print('Training complete')
-
