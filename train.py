@@ -5,7 +5,7 @@ from model import TransformerModel, block_size, device
 from BPEToken import BPE
 #-----Hyperparameters------
 
-batch_size = 64
+batch_size = 32
 max_iters =20000
 eval_interval = 500
 learning_rate = 3e-4

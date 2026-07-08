@@ -6,9 +6,9 @@ import os
 
 #hyperparameter --------------------
 
-block_size = 512 #what is the maximum context length for prediction?
+block_size = 256 #what is the maximum context length for prediction?
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-n_embd = 512
+n_embd = 384
 n_head = 8
 n_layer = 8
 dropout = 0.2
