@@ -1,4 +1,4 @@
-C:\ptoh\DeepLLM\data\encoded_data.pt
-C:\ptoh\DeepLLM\output\bpe_finance.json
-C:\ptoh\DeepLLM\output\checkpoint.pth
-C:\ptoh\DeepLLM\output\loss_curve.png
+data/encoded_data.pt
+output/bpe_finance.json
+output/checkpoint.pth
+output/loss_curve.png
