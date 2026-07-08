@@ -1,4 +1,3 @@
 data/encoded_data.pt
 output/bpe_finance.json
 output/checkpoint.pth
-output/loss_curve.png
