@@ -1,97 +1,13 @@
 # DeepLLM — GPT-Style Language Model from Scratch
 
-A from-scratch implementation of a GPT-style causal transformer trained on a financial Q&A dataset, built entirely in PyTorch without any high-level abstractions.
+From scratch implementation of a GPT style causal transformer trained on a financial Q&A dataset, built entirely in PyTorch without any high-level abstractions.
 
 ---
 
 ## Overview
 
-This project implements a decoder-only transformer language model trained on the [Josephgflowers/Finance-Instruct-500k](https://huggingface.co/datasets/Josephgflowers/Finance-Instruct-500k) dataset from HuggingFace. The goal was to build a finance-domain Q&A bot by training a custom GPT architecture from scratch — including the tokenizer, training loop, and inference pipeline.
+This project implements a decoder only transformer language model trained on the [Josephgflowers/Finance-Instruct-500k](https://huggingface.co/datasets/Josephgflowers/Finance-Instruct-500k) dataset from HuggingFace. The goal was to build a finance-domain Q&A bot by training a custom GPT architecture from scratch which included the tokenizer, training loop, and inference pipeline. Although the results were not that good due too the model simplicity and being trained on small dataset of 50mb.
 
----
-
-## Architecture
-
-|
- Component 
-|
- Details 
-|
-
-|
----
-|
----
-|
-
-|
- Model type 
-|
- Decoder-only causal transformer (GPT-style) 
-|
-
-|
- Parameters 
-|
- ~20M 
-|
-
-|
- Embedding dim 
-|
- 384 
-|
-
-|
- Attention heads 
-|
- 8 
-|
-
-|
- Transformer layers 
-|
- 8 
-|
-
-|
- Context length 
-|
- 256 tokens 
-|
-
-|
- Positional encoding 
-|
- Sinusoidal (fixed) 
-|
-
-|
- Tokenizer 
-|
- Custom BPE (Byte-Pair Encoding) 
-|
-
-|
- Vocab size 
-|
- 8,000 
-|
-
-|
- Activation 
-|
- ReLU 
-|
-
-|
- Regularization 
-|
- Dropout (0.2) 
-|
-
-
----
 
 ## Project Structure
 
