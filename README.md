@@ -64,7 +64,6 @@ Each Q&A pair formatted with special tokens:
 ## Training Results
 
 ---
-|
 
 |
  Final train loss 
