@@ -1,6 +1,6 @@
-# DeepLLM — GPT-Style Language Model from Scratch
+# DeepLLM — GPT Style Language Model from Scratch
 
-From scratch implementation of a GPT style causal transformer trained on a financial Q&A dataset, built entirely in PyTorch without any high-level abstractions.
+From scratch implementation of a GPT style causal transformer trained on a financial Q&A dataset, built entirely in PyTorch without any high level abstractions.
 
 ---
 
@@ -63,15 +63,6 @@ Each Q&A pair formatted with special tokens:
 
 ## Training Results
 
-|
- Metric 
-|
- Value 
-|
-
-|
----
-|
 ---
 |
 
