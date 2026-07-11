@@ -16,13 +16,13 @@ DeepLLM/
 │
 ├── model.py          # Transformer architecture (Head, MHA, FFN, Block, TransformerModel)
 ├── train.py          # Training loop with checkpointing and loss curve saving
-├── inference.py      # Interactive Q&A inference with temperature + top-k sampling
+├── inference.py      # Interactive Q&A inference with temperature + top_k sampling
 ├── BPEToken.py       # Custom BPE tokenizer (fit, encode, decode, save, load)
 │
 ├── data/
 │   ├── dataload.py          # Streams and saves 50MB from HuggingFace dataset
 │   ├── economy_train.txt    # Formatted Q&A training corpus (~50MB)
-│   └── encoded_data.pt      # Pre-encoded token tensor (cached, not tracked by git)
+│   └── encoded_data.pt      # Pre encoded token tensor (cached, not tracked by git)
 │
 └── output/
     ├── checkpoint.pth       # Best model checkpoint (not tracked by git)
@@ -38,22 +38,17 @@ DeepLLM/
 Built a Byte-Pair Encoding tokenizer from scratch with:
 - Base vocabulary of 256 UTF-8 bytes
 - 7,744 learned merge operations
-- Numpy-accelerated encoding via chunk-based `encode_batch()`
+- Accelerated encoding using Numpy via chunk based `encode_batch()`
 - JSON serialization for save/load across runs
 
-### Attention Scaling Fix
-Correctly scales dot-product attention by `head_size` (not `n_embd`):
-```python
-wei = q @ k.transpose(-2, -1) * k.shape[-1]**-0.5
-```
 
 ### Training Pipeline
 - **Optimizer:** AdamW (`lr=3e-4`)
 - **Scheduler:** Cosine annealing to `1e-5`
-- **Batch size:** 64
+- **Batch size:** 48
 - **Iterations:** 20,000
-- **Checkpoint:** Saved every 500 steps — resumes automatically if interrupted
-- **Evaluation:** 200-batch rolling average on train and val splits
+- **Checkpoint:** Saved every 500 steps using checkpoints, resumes automatically if interrupted
+- **Evaluation:** 200 batch rolling average on train and val splits
 
 ### Data Format
 Each Q&A pair formatted with special tokens:
