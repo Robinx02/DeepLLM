@@ -84,7 +84,7 @@ Each Q&A pair formatted with special tokens:
 |
 
 
-> Note: Val loss lower than train loss is expected — dropout (0.2) is active during training but disabled during evaluation, making training loss appear artificially higher.
+> Note: Val loss lower than train loss is expected as dropout (0.2) is active during training but disabled during evaluation, making training loss appear artificially higher.
 
 ---
 
