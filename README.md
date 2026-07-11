@@ -69,7 +69,9 @@ Each Q&A pair formatted with special tokens:
  Final train loss 
 |
  ~1.6 
+|
  Final val loss 
+|
  ~1.35 
  Training tokens 
  17,525,704 
