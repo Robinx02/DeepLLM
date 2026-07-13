@@ -27,7 +27,8 @@ DeepLLM/
 └── output/
     ├── checkpoint.pth       # Best model checkpoint (not tracked by git)
     ├── bpe_finance.json     # Saved BPE tokenizer (not tracked by git)
-    └── loss_curve.png       # Training and validation loss plot
+    ├── loss_curve.png       # Training and validation loss plot
+    └── inference.txt        # The inference result which wasnt that too tbh :< 
 ```
 
 ---
